@@ -1,4 +1,3 @@
-Here’s a detailed `README.md` for the entire Week 3 Challenge project:
 
 ---
 
