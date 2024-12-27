@@ -1,2 +1,3 @@
-data/
+!data/*.dvc
 scripts/__pycache__/
+
