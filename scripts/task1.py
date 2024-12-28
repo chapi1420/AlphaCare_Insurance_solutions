@@ -1,15 +1,15 @@
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 class Eda:
     """
     A class for performing Exploratory Data Analysis (EDA) and data cleaning.
     """
     def __init__(self, file_path):
-        """
-        Initialize the Eda object by loading the dataset.
-        Args:
-            file_path (str): Path to the data file.
-        """
+
         self.file_path = file_path
         self.data = self.load_data()
 
@@ -53,7 +53,7 @@ class Eda:
         else:
             
             plt.figure(figsize=(12, 8))
-            sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+            sns.heatmap(numeric_data.corr(), annot=True, cmap='viridis', fmt=".2f")
             plt.title("Feature Correlation")
             plt.show()
 
