@@ -50,7 +50,6 @@ class DataCleaner:
         self.detect_and_handle_outliers()
         
         return self.df
-if __name__==__main__:
- data = pd.read_csv('C:\\Users\\nadew\\10x\\week3\\ACIS\\data\\cleaned_data\\cleaned_data_v4.csv')
- data = DataCleaner(data)
- data.handle_missing_values()
+data = pd.read_csv('C:\\Users\\nadew\\10x\\week3\\ACIS\\data\\cleaned_data\\cleaned_data_v4.csv')
+data = DataCleaner(data)
+data.handle_missing_values()
