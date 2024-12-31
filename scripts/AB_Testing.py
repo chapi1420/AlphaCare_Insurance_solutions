@@ -1,56 +1,84 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import chi2_contingency, ttest_ind
+from scipy.stats import ttest_ind, chi2_contingency
 
-def perform_ab_testing(df):
-    """
-    Perform A/B hypothesis testing on the insurance data.
-    """
-    # Null Hypotheses to test
-    null_hypotheses = [
-        "There are no risk differences across provinces",
-        "There are no risk differences between zip codes",
-        "There are no significant margin (profit) difference between zip codes",
-        "There are not significant risk difference between Women and Men"
-    ]
+class ABTesting:
+    def __init__(self, data):
+        """
+        Initialize the A/B Testing class with the dataset.
+        Args:
+            data (pd.DataFrame): The cleaned insurance dataset.
+        """
+        self.data = data
 
-    # Perform tests and report results
-    for hypothesis in null_hypotheses:
-        print(f"Testing hypothesis: {hypothesis}")
+    def test_risk_across_provinces(self):
+        """
+        Test the null hypothesis: There are no risk differences across provinces.
+        """
+        print("\nTesting risk differences across provinces...")
         
-        if "risk differences" in hypothesis:
-            if "provinces" in hypothesis:
-                # Test risk differences across provinces
-                risk_by_province = df.groupby("Province")["TotalClaims"].mean()
-                _, p_value, _, _ = chi2_contingency(pd.crosstab(df["Province"], df["TotalClaims"] > 0))
-                
-            else:
-                # Test risk differences between zip codes
-                risk_by_zipcode = df.groupby("PostalCode")["TotalClaims"].mean()
-                _, p_value, _, _ = chi2_contingency(pd.crosstab(df["PostalCode"], df["TotalClaims"] > 0))
-                
-            if p_value < 0.05:
-                print("Reject the null hypothesis. There are significant risk differences.")
-            else:
-                print("Fail to reject the null hypothesis. There are no significant risk differences.")
-                
-        elif "margin (profit) difference" in hypothesis:
-            # Test margin (profit) difference between zip codes
-            profit_by_zipcode = df.groupby("PostalCode")["TotalPremium"].sum() - df.groupby("PostalCode")["TotalClaims"].sum()
-            _, p_value = ttest_ind(profit_by_zipcode.loc[profit_by_zipcode.index % 2 == 0], 
-                                  profit_by_zipcode.loc[profit_by_zipcode.index % 2 != 0])
-            
-            if p_value < 0.05:
-                print("Reject the null hypothesis. There are significant margin differences between zip codes.")
-            else:
-                print("Fail to reject the null hypothesis. There are no significant margin differences between zip codes.")
-                
-        elif "risk difference between Women and Men" in hypothesis:
-            # Test risk difference between genders
-            risk_by_gender = df.groupby("Gender")["TotalClaims"].mean()
-            _, p_value, _, _ = chi2_contingency(pd.crosstab(df["Gender"], df["TotalClaims"] > 0))
-            
-            if p_value < 0.05:
-                print("Reject the null hypothesis. There are significant risk differences between genders.")
-            else:
-                print("Fail to reject the null hypothesis. There are no significant risk differences between genders.")
+        contingency_table = pd.crosstab(self.data["Province"], self.data["TotalClaims"] > 0)
+        chi2, p_value, _, _ = chi2_contingency(contingency_table)
+
+        if p_value < 0.05:
+            print("Reject the null hypothesis. There are significant risk differences across provinces.")
+        else:
+            print("Fail to reject the null hypothesis. There are no significant risk differences across provinces.")
+
+    def test_risk_between_zipcodes(self):
+        """
+        Test the null hypothesis: There are no risk differences between zip codes.
+        """
+        print("\nTesting risk differences between zip codes...")
+        
+        contingency_table = pd.crosstab(self.data["PostalCode"], self.data["TotalClaims"] > 0)
+        chi2, p_value, _, _ = chi2_contingency(contingency_table)
+
+        if p_value < 0.05:
+            print("Reject the null hypothesis. There are significant risk differences between zip codes.")
+        else:
+            print("Fail to reject the null hypothesis. There are no significant risk differences between zip codes.")
+
+    def test_margin_difference_zipcodes(self):
+        """
+        Test the null hypothesis: There are no significant margin differences between zip codes.
+        """
+        print("\nTesting margin differences between zip codes...")
+        
+        profit_by_zipcode = (
+            self.data.groupby("PostalCode")["TotalPremium"].sum() -
+            self.data.groupby("PostalCode")["TotalClaims"].sum()
+        )
+
+        zipcodes_even = profit_by_zipcode.loc[profit_by_zipcode.index % 2 == 0]
+        zipcodes_odd = profit_by_zipcode.loc[profit_by_zipcode.index % 2 != 0]
+
+        t_stat, p_value = ttest_ind(zipcodes_even, zipcodes_odd, nan_policy='omit')
+
+        if p_value < 0.05:
+            print("Reject the null hypothesis. There are significant margin differences between zip codes.")
+        else:
+            print("Fail to reject the null hypothesis. There are no significant margin differences between zip codes.")
+
+    def test_risk_by_gender(self):
+        """
+        Test the null hypothesis: There are no significant risk differences between women and men.
+        """
+        print("\nTesting risk differences between genders...")
+        
+        contingency_table = pd.crosstab(self.data["Gender"], self.data["TotalClaims"] > 0)
+        chi2, p_value, _, _ = chi2_contingency(contingency_table)
+
+        if p_value < 0.05:
+            print("Reject the null hypothesis. There are significant risk differences between genders.")
+        else:
+            print("Fail to reject the null hypothesis. There are no significant risk differences between genders.")
+
+    def perform_all_tests(self):
+        """
+        Perform all A/B hypothesis tests.
+        """
+        self.test_risk_across_provinces()
+        self.test_risk_between_zipcodes()
+        self.test_margin_difference_zipcodes()
+        self.test_risk_by_gender()
