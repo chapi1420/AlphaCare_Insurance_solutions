@@ -1,1 +1,5 @@
+!data/*.dvc
+scripts/__pycache__/
+
 data/
+storage/
