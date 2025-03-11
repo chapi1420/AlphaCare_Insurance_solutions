@@ -7,17 +7,23 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
 
+
+
+
+
+
 class DataPreparation:
     def __init__(self, data_path):
         self.data = data_path
     
     def handle_missing_values(self):
-        self.data.dropna(inplace=True)
-    
+        self.data.dropna(axis=1, how='all', inplace=True)
+        self.data.dropna(thresh=self.data.shape[1] // 2, inplace=True)
     def encode_categorical_data(self):
         categorical_columns = self.data.select_dtypes(include=['object']).columns
         for col in categorical_columns:
-            if self.data[col].nunique() == 0:
+            self.data[col] = self.data[col].astype(str).str.strip()  # Strip whitespaces
+            if self.data[col].replace('', pd.NA).dropna().nunique() == 0:
                 print(f"Skipping column '{col}' as it has no unique values.")
                 continue
             if self.data[col].nunique() < 10:
@@ -32,11 +38,17 @@ class DataPreparation:
 
     
     def split_data(self, target_column):
+        if target_column not in self.data.columns:
+            raise ValueError(f"Target column '{target_column}' not found in data.")
         X = self.data.drop(target_column, axis=1)
         y = self.data[target_column]
+        
+        if X.empty:
+            raise ValueError("Feature set is empty after preprocessing.")
+        if y.isnull().all():
+            raise ValueError("Target column contains only missing values.")
+        
         return train_test_split(X, y, test_size=0.3, random_state=42)
-
-
 class Model:
     def __init__(self, model):
         self.model = model
@@ -100,5 +112,5 @@ class StatisticalModelingPipeline:
 
 
 if __name__ == "__main__":
-    pipeline = StatisticalModelingPipeline(data_path='/home/nahomnadew/Desktop/10x/AlphhaCare_Insurance-v2/AlphaCare_Insurance_solutions/Data/MachineLearningRating_v3.1.csv', target_column='TotalClaims')
+    pipeline = StatisticalModelingPipeline(data_path=pd.read_csv('/home/nahomnadew/Desktop/10x/AlphhaCare_Insurance-v2/AlphaCare_Insurance_solutions/Data/MachineLearningRating_v3.1.csv'), target_column='TotalClaims')
     pipeline.run()
