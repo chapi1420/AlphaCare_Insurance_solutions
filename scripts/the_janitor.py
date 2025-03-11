@@ -41,6 +41,7 @@ class DataCleaner:
             # Handle outliers by capping them
             self.df.loc[self.df[column] < lower_bound, column] = lower_bound
             self.df.loc[self.df[column] > upper_bound, column] = upper_bound
+            return self.df
         
     def preprocess_data(self):
         """
@@ -53,3 +54,6 @@ class DataCleaner:
 data = pd.read_csv('C:\\Users\\nadew\\10x\\week3\\ACIS\\data\\cleaned_data\\cleaned_data_v4.csv')
 data = DataCleaner(data)
 data.handle_missing_values()
+cleaned = data.detect_and_handle_outliers()
+cleaned.to_csv('C:\\Users\\nadew\\10x\\week3\\ACIS\\data\\cleaned_data\\cleaned_data_v5.csv', index=False)
+# The Janitor class is responsible for cleaning and preprocessing the insurance data. It includes methods for handling missing values, detecting and handling outliers, and preprocessing the data. The class takes a DataFrame as input and performs the cleaning operations on it. The handle_missing_values method fills missing values in the dataset with appropriate methods, while the detect_and_handle_outliers method detects and handles outliers using the IQR method. The preprocess_data method combines the two cleaning steps to preprocess the data. The cleaned data is then saved to a new CSV file for further analysis.
