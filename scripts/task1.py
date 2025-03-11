@@ -66,12 +66,15 @@ class Eda:
         for col in columns:
             if col in self.data.columns:
                 plt.figure(figsize=(10, 6))
-                sns.histplot(self.data[col], kde=True, bins=30, color='blue')
+                sns.histplot(self.data[col], kde=True, bins=30, color='pink')
                 plt.title(f"Distribution of {col}")
                 plt.xlabel(col)
                 plt.ylabel("Frequency")
-                plt.grid(axis='y', linestyle='--', alpha=0.7)
+                plt.grid(axis='y', linestyle='--', alpha=1)
                 plt.show()
+                plt.savefig(f"images/{col}_distribution.png")
+            else:
+                print(f"Column {col} not found in the dataset.")
 
     def visualize_relationship(self, x_col, y_col):
         """
@@ -88,7 +91,9 @@ class Eda:
             plt.ylabel(y_col)
             plt.grid(True, linestyle='--', alpha=0.7)
             plt.show()
-
+            plt.savefig(f"images/{x_col}_vs_{y_col}.png")
+        else:
+            print("One or more columns not found in the dataset.")
     def generate_report(self):
         """
         Generate an EDA report summarizing key findings.
