@@ -94,12 +94,11 @@ class StatisticalModelingPipeline:
             print(f"{name} - MSE: {mse:.2f}, R2: {r2:.2f}")
             
             # Feature Importance
-            if name != "Linear Regression":  # Linear Regression doesn't have feature_importances_
+            if name != "Linear Regression": 
                 print(f"Feature importance for {name}:")
                 model_instance.feature_importance(X_train)
 
 
 if __name__ == "__main__":
-    # Replace 'your_data.csv' with the path to your dataset
-    pipeline = StatisticalModelingPipeline(data_path='your_data.csv', target_column='TotalClaims')
+    pipeline = StatisticalModelingPipeline(data_path='/home/nahomnadew/Desktop/10x/AlphhaCare_Insurance-v2/AlphaCare_Insurance_solutions/Data/MachineLearningRating_v3.1.csv', target_column='TotalClaims')
     pipeline.run()
